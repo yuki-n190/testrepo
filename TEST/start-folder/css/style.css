@@ -293,3 +293,8 @@ textarea:focus {
     border: 1px solid var(--accent-color);
     outline: none;
 }
+
+.work-list {
+    list-style: none;
+    padding: 0;
+}
