@@ -121,9 +121,11 @@ export default function DashboardPage() {
             >
               My Workouts
             </Link>
-            <button className="p-2 text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              href="/" 
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors">
               <LogOut className="h-5 w-5" />
-            </button>
+            </Link>
           </div>
         </nav>
       </header>
