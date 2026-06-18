@@ -45,57 +45,139 @@ export default function DashboardPage() {
   // Save押下時:
   // 入力フォームの値からWorkoutオブジェクトを作成し
   // workouts stateを更新して画面を再描画する
-  const handleSaveWorkout = (e: any) => {
-    e.preventDefault()
+  //!! usestateの勉強のために作成、画面上での保存のみなのでコメントアウト
 
-    //もし各フィールドを入力していない場合関数を終了させる
-    if (exercise.trim() === "") {
-      setError("エクササイズ名を入力してください！")
+  // const handleSaveWorkout = (e: any) => {
+  //   e.preventDefault()
+
+  //   //もし各フィールドを入力していない場合関数を終了させる
+  //   if (exercise.trim() === "") {
+  //     setError("エクササイズ名を入力してください！")
+  //     return
+  //   }
+
+  //   if (Number(weight.trim() === "")) {
+  //     setError("重量を入力してください！")
+  //     return
+  //   }
+
+  //   if (Number(reps.trim() === "")) {
+  //     setError("レップ数を入力してください！")
+  //     return
+  //   }
+
+  //   if (Number(sets.trim() === "")) {
+  //     setError("セット数を入力してください！")
+  //     return
+  //   }
+  //   //全項目エラーがなければsetErrorを初期化
+  //   setError("")
+
+  //   //入力情報をもとにnewworkoutオブジェクトを作成
+  //   const newWorkout = {
+  //     id: crypto.randomUUID(),
+  //     name: exercise,
+  //     weight: `${weight}kg`,
+  //     sets: `${reps}×${sets}`,
+  //     tag,
+  //     memo,
+  //     date: "Today",
+  //   }
+    
+  //   //workouts配列を展開して先頭にnewWorkoutを追加
+  //   setWorkouts([
+  //     newWorkout,
+  //     ...workouts,
+  //   ])
+
+  //   //入力完了後フォーム更新
+  //   setExercise("")
+  //   setWeight("")
+  //   setReps("")
+  //   setSets("")
+  //   setTag("")
+  //   setMemo("")
+  // }
+
+  //APIでRDSに保存処理
+  const handleSaveWorkout = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault()
+
+  // 入力チェック
+  if (exercise.trim() === "") {
+    setError("エクササイズ名を入力してください！")
+    return
+  }
+
+  if (weight.trim() === "") {
+    setError("重量を入力してください！")
+    return
+  }
+
+  if (reps.trim() === "") {
+    setError("レップ数を入力してください！")
+    return
+  }
+
+  if (sets.trim() === "") {
+    setError("セット数を入力してください！")
+    return
+  }
+
+  setError("")
+
+  try {
+    const response = await fetch("/api/workouts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        exerciseName: exercise,
+        weight,
+        reps,
+        sets,
+        tag,
+        memo,
+      }),
+    })
+
+    if (!response.ok) {
+      const data = await response.json()
+      setError(data.message || "保存に失敗しました")
       return
     }
 
-    if (Number(weight.trim() === "")) {
-      setError("重量を入力してください！")
-      return
-    }
+    const data = await response.json()
 
-    if (Number(reps.trim() === "")) {
-      setError("レップ数を入力してください！")
-      return
-    }
+    const savedWorkout = data.workout
 
-    if (Number(sets.trim() === "")) {
-      setError("セット数を入力してください！")
-      return
-    }
-    //全項目エラーがなければsetErrorを初期化
-    setError("")
-
-    //入力情報をもとにnewworkoutオブジェクトを作成
     const newWorkout = {
-      id: crypto.randomUUID(),
-      name: exercise,
-      weight: `${weight}kg`,
-      sets: `${reps}×${sets}`,
-      tag,
-      memo,
+      id: savedWorkout.id,
+      name: savedWorkout.exerciseName,
+      weight: `${savedWorkout.weight}kg`,
+      sets: `${savedWorkout.reps}×${savedWorkout.sets}`,
+      tag: savedWorkout.tag || "",
+      memo: savedWorkout.memo || "",
       date: "Today",
     }
-    
-    //workouts配列を展開して先頭にnewWorkoutを追加
+
     setWorkouts([
       newWorkout,
       ...workouts,
     ])
 
-    //入力完了後フォーム更新
     setExercise("")
     setWeight("")
     setReps("")
     setSets("")
     setTag("")
     setMemo("")
+  } catch (error) {
+    console.error(error)
+    setError("予期しないエラーが発生しました")
   }
+}
 
   //記録削除機能
   //指定されたID以外のworkoutだけ残して、一覧を更新する
