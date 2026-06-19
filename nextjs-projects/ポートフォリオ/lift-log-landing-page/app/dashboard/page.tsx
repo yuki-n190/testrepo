@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import { LogOut, Dumbbell, ChevronRight, Flame, Target, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { id } from "date-fns/locale"
 
 const motivationalQuotes = [
   "The only bad workout is the one that didn't happen.",
@@ -98,7 +99,40 @@ export default function DashboardPage() {
   //   setTag("")
   //   setMemo("")
   // }
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+      try {
+        const response = await fetch("/api/workouts", {
+          cache: "no-store",
+        })
 
+        if (!response.ok) {
+          setError("ワークアウトの取得に失敗しました")
+          return
+        }
+
+        const data = await response.json()
+
+        const formattedWorkouts = data.workouts.map((workout: any) => ({
+          id: workout.id,
+          name: workout.exerciseName,
+          weight: `${workout.weight}kg`,
+          sets: `${workout.reps}×${workout.sets}`,
+          tag: workout.tag || "",
+          memo: workout.memo || "",
+          date: new Date(workout.createdAt).toLocaleDateString("ja-JP"),
+        }))
+
+        setWorkouts(formattedWorkouts)
+      } catch (error) {
+        console.error(error )
+        setError("ワークアウトの取得中にエラーが発生しました")
+      }
+    }
+
+    fetchWorkouts()
+  }, [])
+  
   //APIでRDSに保存処理
   const handleSaveWorkout = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault()

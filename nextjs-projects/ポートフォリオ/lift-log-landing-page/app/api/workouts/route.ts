@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { set } from "date-fns";
+
+export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
     try {
@@ -59,4 +60,27 @@ export async function POST(request: Request) {
             { status: 500 }
         )
     }
+}
+
+export async function GET() {
+  try {
+    const workouts = await prisma.workoutLog.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 10,
+    })
+
+    return NextResponse.json({ workouts })
+  } catch (error) {
+    console.error(error)
+
+    return NextResponse.json(
+      {
+        message: "Failed to fetch workouts.",
+        error: String(error),
+      },
+      { status: 500 }
+    )
+  }
 }
