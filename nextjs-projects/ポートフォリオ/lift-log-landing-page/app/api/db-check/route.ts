@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma"
 import { NextResponse } from "next/server"
 
+// 開発用: DB接続確認API
+// 本番公開前に削除する
 export async function GET() {
   try {
     const dbInfo = await prisma.$queryRaw<

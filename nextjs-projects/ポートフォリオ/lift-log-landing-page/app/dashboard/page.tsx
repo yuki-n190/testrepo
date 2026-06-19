@@ -217,8 +217,6 @@ export default function DashboardPage() {
   //指定されたID以外のworkoutだけ残して、一覧を更新する
   const handleDeleteWorkout = async (id: string) => {
 
-    console.log("clicked delete id:", id)
-
     try {
       const response = await fetch(`/api/workouts/${id}`, {
         method: "DELETE",

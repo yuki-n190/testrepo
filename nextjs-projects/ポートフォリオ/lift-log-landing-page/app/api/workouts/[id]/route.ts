@@ -13,11 +13,8 @@ export async function DELETE(
   request: Request,
   { params }: Params
 ) {
-  console.log("DELETE API HIT")
-
   try {
     const { id } = await params
-    console.log("delete id:", id)
 
     await prisma.workoutLog.delete({
       where: {
