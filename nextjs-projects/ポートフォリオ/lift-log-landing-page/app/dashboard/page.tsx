@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Link from "next/link"
 import { LogOut, Dumbbell, ChevronRight, Flame, Target, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { id } from "date-fns/locale"
 
 const motivationalQuotes = [
   "The only bad workout is the one that didn't happen.",
@@ -23,9 +24,9 @@ const motivationalQuotes = [
 ]
 
 const recentWorkouts = [
-  { name: "Bench Press", weight: "185 lbs", sets: "4x8", date: "Today" },
-  { name: "Deadlift", weight: "315 lbs", sets: "3x5", date: "Yesterday" },
-  { name: "Squat", weight: "275 lbs", sets: "5x5", date: "2 days ago" },
+  { id: crypto.randomUUID(), name: "Bench Press", weight: "185 lbs", sets: "4x8", date: "Today" },
+  { id: crypto.randomUUID(), name: "Deadlift", weight: "315 lbs", sets: "3x5", date: "Yesterday" },
+  { id: crypto.randomUUID(), name: "Squat", weight: "275 lbs", sets: "5x5", date: "2 days ago" },
 ]
 
 export default function DashboardPage() {
@@ -35,6 +36,189 @@ export default function DashboardPage() {
   const [sets, setSets] = useState("")
   const [tag, setTag] = useState("")
   const [memo, setMemo] = useState("")
+  const [error, setError] = useState("")
+
+  //workouts一覧をstateで管理
+  //現在はrecentWorkoutsを初期値として利用
+  //将来的にはDBから取得したデータを使用
+  const [workouts, setWorkouts] = useState(recentWorkouts)
+
+  // Save押下時:
+  // 入力フォームの値からWorkoutオブジェクトを作成し
+  // workouts stateを更新して画面を再描画する
+  //!! usestateの勉強のために作成、画面上での保存のみなのでコメントアウト
+
+  // const handleSaveWorkout = (e: any) => {
+  //   e.preventDefault()
+
+  //   //もし各フィールドを入力していない場合関数を終了させる
+  //   if (exercise.trim() === "") {
+  //     setError("エクササイズ名を入力してください！")
+  //     return
+  //   }
+
+  //   if (Number(weight.trim() === "")) {
+  //     setError("重量を入力してください！")
+  //     return
+  //   }
+
+  //   if (Number(reps.trim() === "")) {
+  //     setError("レップ数を入力してください！")
+  //     return
+  //   }
+
+  //   if (Number(sets.trim() === "")) {
+  //     setError("セット数を入力してください！")
+  //     return
+  //   }
+  //   //全項目エラーがなければsetErrorを初期化
+  //   setError("")
+
+  //   //入力情報をもとにnewworkoutオブジェクトを作成
+  //   const newWorkout = {
+  //     id: crypto.randomUUID(),
+  //     name: exercise,
+  //     weight: `${weight}kg`,
+  //     sets: `${reps}×${sets}`,
+  //     tag,
+  //     memo,
+  //     date: "Today",
+  //   }
+    
+  //   //workouts配列を展開して先頭にnewWorkoutを追加
+  //   setWorkouts([
+  //     newWorkout,
+  //     ...workouts,
+  //   ])
+
+  //   //入力完了後フォーム更新
+  //   setExercise("")
+  //   setWeight("")
+  //   setReps("")
+  //   setSets("")
+  //   setTag("")
+  //   setMemo("")
+  // }
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+      try {
+        const response = await fetch("/api/workouts", {
+          cache: "no-store",
+        })
+
+        if (!response.ok) {
+          setError("ワークアウトの取得に失敗しました")
+          return
+        }
+
+        const data = await response.json()
+
+        const formattedWorkouts = data.workouts.map((workout: any) => ({
+          id: workout.id,
+          name: workout.exerciseName,
+          weight: `${workout.weight}kg`,
+          sets: `${workout.reps}×${workout.sets}`,
+          tag: workout.tag || "",
+          memo: workout.memo || "",
+          date: new Date(workout.createdAt).toLocaleDateString("ja-JP"),
+        }))
+
+        setWorkouts(formattedWorkouts)
+      } catch (error) {
+        console.error(error )
+        setError("ワークアウトの取得中にエラーが発生しました")
+      }
+    }
+
+    fetchWorkouts()
+  }, [])
+  
+  //APIでRDSに保存処理
+  const handleSaveWorkout = async (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault()
+
+  // 入力チェック
+  if (exercise.trim() === "") {
+    setError("エクササイズ名を入力してください！")
+    return
+  }
+
+  if (weight.trim() === "") {
+    setError("重量を入力してください！")
+    return
+  }
+
+  if (reps.trim() === "") {
+    setError("レップ数を入力してください！")
+    return
+  }
+
+  if (sets.trim() === "") {
+    setError("セット数を入力してください！")
+    return
+  }
+
+  setError("")
+
+  try {
+    const response = await fetch("/api/workouts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        exerciseName: exercise,
+        weight,
+        reps,
+        sets,
+        tag,
+        memo,
+      }),
+    })
+
+    if (!response.ok) {
+      const data = await response.json()
+      setError(data.message || "保存に失敗しました")
+      return
+    }
+
+    const data = await response.json()
+
+    const savedWorkout = data.workout
+
+    const newWorkout = {
+      id: savedWorkout.id,
+      name: savedWorkout.exerciseName,
+      weight: `${savedWorkout.weight}kg`,
+      sets: `${savedWorkout.reps}×${savedWorkout.sets}`,
+      tag: savedWorkout.tag || "",
+      memo: savedWorkout.memo || "",
+      date: "Today",
+    }
+
+    setWorkouts([
+      newWorkout,
+      ...workouts,
+    ])
+
+    setExercise("")
+    setWeight("")
+    setReps("")
+    setSets("")
+    setTag("")
+    setMemo("")
+  } catch (error) {
+    console.error(error)
+    setError("予期しないエラーが発生しました")
+  }
+}
+
+  //記録削除機能
+  //指定されたID以外のworkoutだけ残して、一覧を更新する
+  const handleDeleteWorkout = (id: string) => {
+    console.log("delete clicked:", id)
+    setWorkouts(workouts.filter((workout) => workout.id !== id))
+  }
 
   const todayQuote = motivationalQuotes[0]
 
@@ -53,9 +237,11 @@ export default function DashboardPage() {
             >
               My Workouts
             </Link>
-            <button className="p-2 text-muted-foreground hover:text-foreground transition-colors">
+            <Link
+              href="/" 
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors">
               <LogOut className="h-5 w-5" />
-            </button>
+            </Link>
           </div>
         </nav>
       </header>
@@ -130,7 +316,12 @@ export default function DashboardPage() {
                 <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Log Workout</p>
               </div>
 
-              <form className="space-y-5">
+              <form className="space-y-5" onSubmit={handleSaveWorkout} noValidate>
+                {error && (
+                  <p className="text-sm text-red-500">
+                    {error}
+                  </p>
+                )}
                 <div className="space-y-2">
                   <Label
                     htmlFor="exercise"
@@ -263,11 +454,17 @@ export default function DashboardPage() {
               </div>
 
               <div className="space-y-4">
-                {recentWorkouts.map((workout, i) => (
+                {workouts.map((workout) => (
                   <div
-                    key={i}
+                    key={workout.id}
                     className="flex items-center justify-between py-4 border-b border-border last:border-0"
                   >
+                  <Button
+                  type="button"
+                  onClick={() => handleDeleteWorkout(workout.id)}
+                  >
+                  Delete
+                  </Button>
                     <div>
                       <h3 className="font-display text-xl tracking-tight">{workout.name}</h3>
                       <p className="text-sm text-muted-foreground mt-1">
