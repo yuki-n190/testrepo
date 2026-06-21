@@ -110,9 +110,14 @@ export default async function WorkoutDetailPage({ params }: WorkoutDetailPagePro
 
         {/* Actions - UI only for now */}
         <section className="flex flex-col sm:flex-row gap-4">
-          <Button className="h-14 flex-1 text-xs uppercase tracking-widest gap-2">
-            <Pencil className="h-4 w-4" />
-            Edit Workout
+          <Button
+           asChild
+           className="h-14 flex-1 text-xs uppercase tracking-widest gap-2"
+           >
+            <Link href={`/workouts/${workout.id}/edit`}>
+              <Pencil className="h-4 w-4" />
+              Edit Workout
+            </Link>
           </Button>
 
           <DeleteWorkoutButton workoutId={workout.id} />
