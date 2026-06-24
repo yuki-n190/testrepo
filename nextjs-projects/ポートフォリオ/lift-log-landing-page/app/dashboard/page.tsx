@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { use, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { LogOut, Dumbbell, ChevronRight, Flame, Target, TrendingUp } from "lucide-react"
@@ -45,6 +45,7 @@ export default function DashboardPage() {
   //現在はrecentWorkoutsを初期値として利用
   //将来的にはDBから取得したデータを使用
   const [workouts, setWorkouts] = useState(recentWorkouts)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
 
   // Save押下時:
   // 入力フォームの値からWorkoutオブジェクトを作成し
@@ -135,6 +136,31 @@ export default function DashboardPage() {
 
     fetchWorkouts()
   }, [])
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/me", {
+          cache: "no-store",
+        })
+
+        if (!response.ok) {
+          router.push("/sign-in")
+          router.refresh()
+          return
+        }
+
+
+        setIsCheckingAuth(false)
+      } catch (error) {
+        console.error(error)
+        router.push("/sign-in")
+        router.refresh()
+      }
+    }
+
+    checkAuth()
+  }, [router])
 
   //APIでRDSに保存処理
   const handleSaveWorkout = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -253,7 +279,17 @@ export default function DashboardPage() {
   }
 
   const todayQuote = motivationalQuotes[0]
-
+  
+  if (isCheckingAuth) {
+    return (
+      <main className="min-h-screed flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">
+          Checking authentication...
+        </p>
+      </main>
+    )
+  }
+  
   return (
     <main className="min-h-screen pb-24">
       {/* Header */}
