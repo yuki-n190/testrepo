@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { LogOut, Dumbbell, ChevronRight, Flame, Target, TrendingUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -30,6 +31,8 @@ const recentWorkouts = [
 ]
 
 export default function DashboardPage() {
+  const router = useRouter()
+
   const [exercise, setExercise] = useState("")
   const [weight, setWeight] = useState("")
   const [reps, setReps] = useState("")
@@ -235,6 +238,20 @@ export default function DashboardPage() {
     }
   }
 
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+      })
+
+      router.push("/")
+      router.refresh()
+    } catch (error) {
+      console.error(error)
+      setError("ログアウトに失敗しました")
+    }
+  }
+
   const todayQuote = motivationalQuotes[0]
 
   return (
@@ -252,11 +269,13 @@ export default function DashboardPage() {
             >
               My Workouts
             </Link>
-            <Link
-              href="/" 
-              className="p-2 text-muted-foreground hover:text-foreground transition-colors">
-              <LogOut className="h-5 w-5" />
-            </Link>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <LogOut className="h-5 w-5"/>
+            </button>   
           </div>
         </nav>
       </header>

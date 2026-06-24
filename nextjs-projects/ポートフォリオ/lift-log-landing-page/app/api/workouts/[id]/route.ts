@@ -48,8 +48,8 @@ export async function PATCH(
     const { id } = await params
     const body = await request.json()
 
-    const { exerciseName, wight, reps, sets, rest, tag, memo } = body
-
+    const { exerciseName, weight, reps, sets, rest, tag, memo } = body
+    
     if ( !exerciseName || !Weight || !reps || !sets ) {
       return NextResponse.json(
         { message: "Required fields are missing." },
@@ -63,7 +63,7 @@ export async function PATCH(
       },
       data: {
         exerciseName,
-        weight: Number(Weight),
+        weight: Number(weight),
         reps: Number(reps),
         sets: Number(sets),
         rest: rest ? Number(rest) : null,

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { NullTypes } from "@prisma/client/runtime/client";
 
 export const dynamic = "force-dynamic"
 
@@ -8,6 +9,20 @@ export async function POST(request: Request) {
         const body = await request.json()
 
         const { exerciseName, weight, reps, sets, rest, tag, memo } = body
+
+        // const weightNumber = Number(weight)
+        // const repsNumber = Number(reps)
+        // const setsNumber = Number(sets)
+        // const restNumber = rest ? Number(rest): null
+// 
+        // if (
+            // !exerciseName ||
+            // weight === "" ||
+            // reps === "" ||
+            // sets === "" ||
+            // !Number.isFinite(weightNumber) ||
+            // !N
+        // )
 
         if (!exerciseName || !weight || !reps || !sets) {
             return NextResponse.json(
