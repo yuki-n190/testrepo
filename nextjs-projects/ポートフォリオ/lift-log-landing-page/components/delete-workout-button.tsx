@@ -52,7 +52,7 @@ export function DeleteWorkoutButton({ workoutId }: DeleteWorkoutButtonProps) {
         variant="outline"
         onClick={handleDelete}
         disabled={isDeleting}
-        className="h-14 w-full text-xs uppercase tracking-widest gap-2 border-border text-muted-foreground hover:text-foreground bg-transparent"
+        className="h-14 w-full text-xs uppercase tracking-widest gap-2 border-red-500/30 bg-red-500/5 text-red-300 hover:bg-red-500/10 hover:text-red-200 hover:border-red-400/50 transition-colors"
       >
         <Trash2 className="h-4 w-4" />
         {isDeleting ? "Deleting..." : "Delete"}

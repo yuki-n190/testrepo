@@ -6,6 +6,13 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 type WorkoutEditFormProps = {
   workout: {
@@ -23,14 +30,30 @@ type WorkoutEditFormProps = {
 export function WorkoutEditForm({ workout }: WorkoutEditFormProps) {
   const router = useRouter()
 
+  const initialRestUnit =
+    workout.rest !== null && workout.rest % 60 === 0
+      ? "minutes"
+      : "seconds"
+
+  const initialRest =
+    workout.rest === null
+      ? ""
+      : initialRestUnit === "minutes"
+        ? String(workout.rest / 60)
+        : String(workout.rest)
+
   const [exerciseName, setExerciseName] = useState(workout.exerciseName)
   const [weight, setWeight] = useState(String(workout.weight))
   const [reps, setReps] = useState(String(workout.reps))
   const [sets, setSets] = useState(String(workout.sets))
-  const [rest, setRest] = useState(workout.rest ? String(workout.rest) : "")
+  const [rest, setRest] = useState(initialRest)
+  const [restUnit, setRestUnit] = useState<"seconds" | "minutes">(
+    initialRestUnit
+  )
   const [tag, setTag] = useState(workout.tag || "")
   const [memo, setMemo] = useState(workout.memo || "")
   const [error, setError] = useState("")
+  const [successMessage, setSuccessMessage] = useState("")
   const [isSaving, setIsSaving] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -56,7 +79,15 @@ export function WorkoutEditForm({ workout }: WorkoutEditFormProps) {
       return
     }
 
+    const restInSeconds =
+      rest.trim() === ""
+        ? ""
+        : restUnit === "minutes"
+          ? String(Number(rest) * 60)
+          : rest
+
     setError("")
+    setSuccessMessage("")
     setIsSaving(true)
 
     try {
@@ -70,16 +101,19 @@ export function WorkoutEditForm({ workout }: WorkoutEditFormProps) {
           weight,
           reps,
           sets,
-          rest,
+          rest: restInSeconds,
           tag,
           memo,
         }),
       })
 
       if (!response.ok) {
-        setError("更新に失敗しました")
+        const data = await response.json()
+        setError(data.message || "更新に失敗しました")
         return
       }
+
+      setSuccessMessage("Workout updated!")
 
       router.push(`/workouts/${workout.id}`)
       router.refresh()
@@ -96,6 +130,12 @@ export function WorkoutEditForm({ workout }: WorkoutEditFormProps) {
       {error && (
         <p className="text-sm text-red-500">
           {error}
+        </p>
+      )}
+
+      {successMessage && (
+        <p className="text-sm text-green-500">
+          {successMessage}
         </p>
       )}
 
@@ -116,6 +156,8 @@ export function WorkoutEditForm({ workout }: WorkoutEditFormProps) {
             Weight
           </label>
           <Input
+            type="text"
+            inputMode="decimal"
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             placeholder="67.5"
@@ -127,6 +169,8 @@ export function WorkoutEditForm({ workout }: WorkoutEditFormProps) {
             Reps
           </label>
           <Input
+            type="text"
+            inputMode="numeric"
             value={reps}
             onChange={(e) => setReps(e.target.value)}
             placeholder="5"
@@ -138,6 +182,8 @@ export function WorkoutEditForm({ workout }: WorkoutEditFormProps) {
             Sets
           </label>
           <Input
+            type="text"
+            inputMode="numeric"
             value={sets}
             onChange={(e) => setSets(e.target.value)}
             placeholder="4"
@@ -145,15 +191,39 @@ export function WorkoutEditForm({ workout }: WorkoutEditFormProps) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        <label className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-          Rest
-        </label>
-        <Input
-          value={rest}
-          onChange={(e) => setRest(e.target.value)}
-          placeholder="180"
-        />
+      <div className="grid grid-cols-[1fr_120px] gap-3">
+        <div className="space-y-2">
+          <label className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+            Rest
+          </label>
+          <Input
+            type="text"
+            inputMode="numeric"
+            value={rest}
+            onChange={(e) => setRest(e.target.value)}
+            placeholder="180"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+            Unit
+          </label>
+          <Select
+            value={restUnit}
+            onValueChange={(value) =>
+              setRestUnit(value as "seconds" | "minutes")
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="seconds">sec</SelectItem>
+              <SelectItem value="minutes">min</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="space-y-2">

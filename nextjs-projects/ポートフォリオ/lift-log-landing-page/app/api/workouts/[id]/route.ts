@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 
 import { getCurrentUser } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { validateWorkoutInput } from "@/lib/validations/workout"
+import { FieldError } from "@/components/ui/field"
 
 export const dynamic = "force-dynamic"
 
@@ -71,11 +73,14 @@ export async function PATCH(
     const { id } = await params
     const body = await request.json()
 
-    const { exerciseName, weight, reps, sets, rest, tag, memo } = body
-    
-    if ( !exerciseName || !weight || !reps || !sets ) {
+    const validation = validateWorkoutInput(body)
+
+    if (!validation.ok) {
       return NextResponse.json(
-        { message: "Required fields are missing." },
+        {
+          messsage: validation.message,
+          fieldErrors: validation.fieldErrors,
+        },
         { status: 400 }
       )
     }
@@ -108,15 +113,15 @@ export async function PATCH(
         id,
       },
       data: {
-        exerciseName,
-        weight: Number(weight),
-        reps: Number(reps),
-        sets: Number(sets),
-        rest: rest ? Number(rest) : null,
-        tag: tag || null,
-        memo: memo || null,
+      exerciseName: validation.data.exerciseName,
+      weight: validation.data.weight,
+      reps: validation.data.reps,
+      sets: validation.data.sets,
+      rest: validation.data.rest,
+      tag: validation.data.tag,
+      memo: validation.data.memo,
       },
-    })
+      })
 
     return NextResponse.json({
       message: "Workout updated.",

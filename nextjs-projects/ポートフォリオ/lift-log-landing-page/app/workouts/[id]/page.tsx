@@ -53,11 +53,24 @@ export default async function WorkoutDetailPage({ params }: WorkoutDetailPagePro
     </header>
   )
 
+  function formatRest(rest: number | null) {
+    if (rest === null) {
+      return "Not set"
+    }
+  
+    if (rest >= 60 && rest % 60 === 0) {
+      return `${rest / 60} min`
+    }
+  
+    return `${rest} sec`
+  }
+
   const stats = [
     { label: "Weight", value: `${workout.weight}kg` },
     { label: "Sets", value: workout.sets },
     { label: "Reps", value: workout.reps },
-    { label: "Total Volume", value: `${volume}kg` }
+    { label: "Rest", value: formatRest(workout.rest) },
+    { label: "Total Volume", value: `${volume}kg` },
   ]
 
   return (
@@ -90,11 +103,18 @@ export default async function WorkoutDetailPage({ params }: WorkoutDetailPagePro
         {/* Main stats */}
         <section className="grid grid-cols-2 gap-px bg-border border border-border mb-10">
           {stats.map((stat) => (
-            <div key={stat.label} className="bg-card p-6">
+            <div
+              key={stat.label}
+              className={
+                stat.label === "Total Volume"
+                  ? "bg-card p-6 col-span-2 text-center"
+                  : "bg-card p-6"
+              }
+            >
               <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-3">
                 {stat.label}
               </p>
-
+        
               <p className="font-display text-4xl md:text-5xl tracking-tight">
                 {stat.value}
               </p>

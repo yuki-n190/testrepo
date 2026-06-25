@@ -52,7 +52,7 @@ export default async function WorkoutsPage() {
           </h1>
 
           <p className="mt-3 text-lg text-muted-foreground">
-            Review every set, rep, and lift.
+            Log every set. Build visible progress.
           </p>
         </section>
 
