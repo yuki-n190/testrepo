@@ -45,7 +45,7 @@ LiftLogは、筋トレの記録を管理するためのWebアプリです。
 
 ## 設計ドキュメント
 
-- [要件定義・基本設計・詳細設計の一覧_Googleスプレッドシート](【https://docs.google.com/spreadsheets/d/1a0xnYEhYJok-ni0gk58ublJnKdo-uonTuQ5c0f577K4/edit?usp=sharing】)
+- [要件定義・基本設計・詳細設計の一覧_Googleスプレッドシート](https://docs.google.com/spreadsheets/d/1a0xnYEhYJok-ni0gk58ublJnKdo-uonTuQ5c0f577K4/edit?usp=sharing)
 - [ワークフロー図](docs/LiftLog_ワークフロー図.png)
 - [ER図](docs/LiftLog_ER図.png)
 - [ワイヤーフレーム](docs/LiftLog_ワイヤーフレーム.png)
@@ -82,19 +82,19 @@ LiftLogは、筋トレの記録を管理するためのWebアプリです。
 
 ## テスト・修正の設計及び実施書
 
-- [テスト・修正の設計及び実施書_Googleスプレッドシート](【https://docs.google.com/spreadsheets/d/13-3rVArbezQnb8PENJ-RzTgTgRFOJVklw-QgvfY2Mew/edit?usp=sharing】)
+- [テスト・修正の設計及び実施書_Googleスプレッドシート](https://docs.google.com/spreadsheets/d/13-3rVArbezQnb8PENJ-RzTgTgRFOJVklw-QgvfY2Mew/edit?usp=sharing)
 
 ---
 
 ## アプリの改善案
 
-- [アプリの改善案_Googleスプレッドシート](【https://docs.google.com/spreadsheets/d/1PllN1bwxwAztqOGOJE8tATFy1n3FjVtRBTEIfADb2X8/edit?usp=sharing】)
+- [アプリの改善案_Googleスプレッドシート](https://docs.google.com/spreadsheets/d/1PllN1bwxwAztqOGOJE8tATFy1n3FjVtRBTEIfADb2X8/edit?usp=sharing)
 
 ---
 
 ## GitHub Actions実行結果
 
-- [ESLintの実行結果_GitHub Actions](【https://github.com/yuki-n190/liftlog-portfolio/actions】)
+- [ESLintの実行結果_GitHub Actions](https://github.com/yuki-n190/liftlog-portfolio/actions)
 
 GitHub Actionsを使用し、pushまたはpull request時にESLintを自動実行しています。  
 コードの静的解析を行い、構文エラーやLintルール違反を確認できるようにしています。
